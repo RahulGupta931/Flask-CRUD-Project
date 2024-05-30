@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th:last-child,
+        td:last-child {
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            margin: 0 4px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-edit {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: #fff;
+        }
+
+        .btn:hover {
+            background-color: #333;
+        }
+
+        .addUser_btn {
+            padding: 10px 20px;
+            background-color: hsl(0, 100%, 50%);
+            border: none;
+            border-radius: 5px;
+            font-size: large;
+            color: #fff;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .addUser_btn:hover {
+            background-color: #b30000;
+        }
+
+        /* Styles for popup form */
+        .overlay {
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            margin: 50px auto;
+
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .popup {
+            margin: 50px auto;
+
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 2;
+        }
+
+        .overlayDelete-btn {
+            padding: 30px;
+            border-radius: 8px;
+            width: 400px;
+            margin: 50px auto;
+
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .popupDelete-btn {
+            margin: 50px auto;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>User List</h1>
+        <h4>Here display users data.</h4>
+
+        <hr>
+        <br>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            {% for User in data %}
+            <tbody>
+                <tr>
+                    <td>{{User.id}}</td>
+                    <td>{{User.first_name}}</td>
+                    <td>{{User.last_name}}</td>
+                    <td>{{User.phone_no}}</td>
+                    <td>{{User.address}}</td>
+                    <td>
+                        <button class="btn btn-edit"
+                            onclick="openForm('{{ User.id }}', '{{ User.first_name }}', '{{ User.last_name }}', '{{ User.phone_no }}', '{{ User.address }}')">Edit</button>
+                        <button type="submit" class="btn btn-delete"
+                            onclick="openDeletePopUP('{{User.id}}')">Delete</button>
+                    </td>
+                </tr>
+                <!-- Add more rows here if needed -->
+            </tbody>
+            {% endfor %}
+
+        </table>
+        <br>
+        <hr>
+        <br>
+        <a href="/" class="addUser_btn">Add new User</a>
+    </div>
+
+    <!-- Popup Form -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <h3>Edit User</h3>
+        <hr>
+
+        <!-- Add your form fields here -->
+
+        <form id="editForm" method="POST" action="/edit">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <br>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <br>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <br>
+                <input type="text" id="phoneNumber" name="phoneNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <br>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <br>
+            <hr>
+            <button type="submit" class="btn" onclick="delete_btn()">Done</button>
+            <button type="button" class="btn" onclick="closeForm()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Delete Popup  -->
+    <div class="overlayDelete-btn" id="overlayDelete-btn"></div>
+    <div class="popupDelete-btn" id="popupDelete-btn">
+        <h3>Delete this user</h3>
+        <button type="submit" class="btn" id="deleteYes" onclick="delete_btn()">Yes</button>
+        <button type="button" class="btn" onclick="closeDeletePopUp()">No</button>
+        <br>
+        <hr>
+
+    </div>
+
+    <script>
+        function delete_btn() {
+            const id = document.getElementById("deleteYes").value;
+            console.log('id', id)
+            fetch('/delete/' + id, { method: 'POST' });
+            window.location.reload();
+
+        }
+
+        function openDeletePopUP(id) {
+            document.getElementById("deleteYes").value = id;
+
+            document.getElementById("overlayDelete-btn").style.display = "block";
+            document.getElementById("popupDelete-btn").style.display = "block";
+
+        }
+
+        function closeDeletePopUp() {
+            document.getElementById("overlayDelete-btn").style.display = "none";
+            document.getElementById("popupDelete-btn").style.display = "none";
+        }
+
+
+
+        function openForm(id, first_name, last_name, phone_no, address) {
+            console.log('data', id)
+            document.getElementById("firstName").value = first_name;
+            document.getElementById("lastName").value = last_name;
+            document.getElementById("phoneNumber").value = phone_no;
+            document.getElementById("address").value = address;
+            document.getElementById("editForm").action = '/edit/' + id;
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closeForm() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
+
+</body>
+
+</html>
